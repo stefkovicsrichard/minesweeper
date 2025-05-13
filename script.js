@@ -23,7 +23,7 @@ function gen() {
                 td.number = 0;
                 td.innerText = "##";
                 td.isBomb = Math.floor((Math.random()*100)+1)<=chance;
-                    if (td.isBomb) td.style.backgroundColor = "rgba(255, 0, 0, 0.2)"
+                    // if (td.isBomb) td.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
                 td.addEventListener("click", () => {clickCheck(td)}, {once: true});
                 tr.appendChild(td);
             }
@@ -59,8 +59,28 @@ function clickCheck(cell) {
         document.body.style.display = "none";
         console.log("bomb");
     } else {
-        cell.revealed = true;
+        reveal(cell);
         console.log("not bomb, num: " + cell.number + " " + cell.id);
+    }
+}
+
+function reveal(cell) {
+    cell.innerText = cell.number;
+    if (cell.number == 0) {
+        const table = document.getElementById("table");
+        const height = table.cHeight;
+        const width = table.cWidth;
+        const cellId = cell.id.split("_");
+        const cI = cellId[0]*1;
+        const cJ = cellId[1]*1;
+        console.log(cellId, cI, cJ, width, height)
+        for (let i = 0; i < dirs.length; i++) {
+            if (isInbounds(cI+dirs[i][0], cJ+dirs[i][1], height, width)) {
+                var cCell = document.getElementById(`${cI+dirs[i][0]}_${cJ+dirs[i][1]}`);
+                console.log(dirs[i], cCell);
+                if (!cCell.revealed && cCell.number == 0) reveal(cCell);
+            }
+        }
     }
 }
 
