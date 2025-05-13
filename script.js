@@ -12,7 +12,7 @@ function gen() {
             const td = document.createElement("td");
             td.innerText = i+j;
             td.isBomb = false;
-            td.id = `${i}-${j}`;
+            td.id = `${i}_${j}`;
             tr.appendChild(td);
         }
         table.appendChild(tr);
@@ -24,10 +24,13 @@ function isBomb(cell) {
     table = document.getElementById("table");
     for (let i = 0; i < table.cHeight; i++) {
         for (let j = 0; j < table.cWidth; j++) {
-            if (document.getElementById(`${i}-${j}`).isBomb) {
-                console.log("bomb");
-            } else {
-                console.log("not bomb");
+            var coords = cell.split("_");
+            if (i == coords[0] && j == coords[1]) {
+                if (document.getElementById(cell).isBomb) {
+                    console.log("bomb");
+                } else {
+                    console.log("not bomb");
+                }
             }
         }
     }
