@@ -1,3 +1,5 @@
+const dirs = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]];
+
 function gen() {
     if (document.getElementById("table")) {
         document.getElementById("table").remove();
@@ -33,62 +35,23 @@ function gen() {
         //#region numbering
         for (let i = 0; i < height; i++) {
             for (let j = 0; j < width; j++) {
-                var cell = document.getElementById(`${i}_${j}`)
-                if (cell.isBomb) cell.number = -1;
-                else if (i == 0 && j == 0) {
-                    if (document.getElementById(`${i}_${j+1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i+1}_${j+1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i+1}_${j}`).isBomb) cell.number++;
-                } else if (i == 0 && j == width-1) {
-                    if (document.getElementById(`${i}_${j-1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i+1}_${j-1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i+1}_${j}`).isBomb) cell.number++;
-                } else if (i == height-1 && j == width-1) {
-                    if (document.getElementById(`${i}_${j-1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i-1}_${j-1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i-1}_${j}`).isBomb) cell.number++;
-                } else if (i == height-1 && j == 0) {
-                    if (document.getElementById(`${i}_${j+1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i-1}_${j+1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i-1}_${j}`).isBomb) cell.number++;
-                } else if (i == 0) {
-                    if (document.getElementById(`${i}_${j-1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i+1}_${j-1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i+1}_${j}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i+1}_${j+1}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i}_${j+1}`).isBomb) cell.number++;
-                } else if (j == 0) {
-                    if (document.getElementById(`${i-1}_${j}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i-1}_${j+1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i}_${j+1}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i+1}_${j+1}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i+1}_${j}`).isBomb) cell.number++;
-                } else if (i == height-1) {
-                    if (document.getElementById(`${i}_${j-1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i-1}_${j-1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i-1}_${j}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i-1}_${j+1}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i}_${j+1}`).isBomb) cell.number++;
-                } else if (j == width-1) {
-                    if (document.getElementById(`${i-1}_${j}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i-1}_${j-1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i}_${j-1}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i+1}_${j-1}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i+1}_${j}`).isBomb) cell.number++;
-                } else {
-                    if (document.getElementById(`${i-1}_${j}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i-1}_${j+1}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i}_${j+1}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i+1}_${j+1}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i+1}_${j}`).isBomb) cell.number++; 
-                    if (document.getElementById(`${i+1}_${j-1}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i}_${j-1}`).isBomb) cell.number++;
-                    if (document.getElementById(`${i-1}_${j-1}`).isBomb) cell.number++;
+                var cell = document.getElementById(`${i}_${j}`);
+                if (cell.isBomb) cell.number = -1; else {
+                    for (let k = 0; k < dirs.length; k++) {
+                        if (isInbounds(i+dirs[k][0], j+dirs[k][1], height, width)) {
+                            if (document.getElementById(`${i+dirs[k][0]}_${j+dirs[k][1]}`).isBomb) cell.number++;
+                        }
+                    }
                 }
             }
         }
         //#endregion
     }
+}
+
+function isInbounds(i, j, h, w) {
+    if (i >= h || i < 0 || j >= w || j < 0) return false;
+    return true;
 }
 
 function clickCheck(cell) {
@@ -97,7 +60,7 @@ function clickCheck(cell) {
         console.log("bomb");
     } else {
         cell.revealed = true;
-        console.log("not bomb, num: " + cell.number);
+        console.log("not bomb, num: " + cell.number + " " + cell.id);
     }
 }
 
