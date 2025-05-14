@@ -61,14 +61,11 @@ function isInbounds(i, j, h, w) {
 }
 
 function flag(cell) {
-    console.log("fdjoifhsdkj")
     if (!cell.revealed) {
         if (cell.flagged == false) {
-        console.log("flagged");
             cell.innerText = "!!";
             cell.flagged = true;
         } else {
-            console.log("unflagged");
             cell.innerText = "##";
             cell.flagged = false;
         }
@@ -80,10 +77,8 @@ function clickCheck(cell) {
         cell.onclick = "";
         if (cell.isBomb) {
             document.body.style.display = "none";
-            console.log("bomb");
         } else {
             reveal(cell);
-            console.log("not bomb, num: " + cell.number + " " + cell.id);
         }
     }
 }
