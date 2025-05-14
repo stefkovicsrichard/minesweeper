@@ -22,9 +22,21 @@ function gen() {
                 td.revealed = false;
                 td.number = 0;
                 td.innerText = "##";
+                td.flagged = false;
                 td.isBomb = Math.floor((Math.random()*100)+1)<=chance;
                     // if (td.isBomb) td.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
-                td.addEventListener("click", () => {clickCheck(td)}, {once: true});
+                td.onclick = () => {clickCheck(td)}
+                td.addEventListener('contextmenu', (td) => {
+                    event.preventDefault();
+                    if (!td.flagged) {
+                        td.innerText = "!!";
+                        td.flagged = true;
+                    } else {
+                        td.innerText = "##";
+                        td.flagged = false;
+                    }
+                    return false;
+                }, false);
                 tr.appendChild(td);
             }
             table.appendChild(tr);
@@ -55,6 +67,7 @@ function isInbounds(i, j, h, w) {
 }
 
 function clickCheck(cell) {
+    cell.onclick = "";
     if (cell.isBomb) {
         document.body.style.display = "none";
         console.log("bomb");
@@ -66,6 +79,8 @@ function clickCheck(cell) {
 
 function reveal(cell) {
     cell.innerText = cell.number;
+    cell.revealed = true;
+    cell.onclick = "";
     if (cell.number == 0) {
         const table = document.getElementById("table");
         const height = table.cHeight;
@@ -78,7 +93,7 @@ function reveal(cell) {
             if (isInbounds(cI+dirs[i][0], cJ+dirs[i][1], height, width)) {
                 var cCell = document.getElementById(`${cI+dirs[i][0]}_${cJ+dirs[i][1]}`);
                 console.log(dirs[i], cCell);
-                if (!cCell.revealed && cCell.number == 0) reveal(cCell);
+                if (!cCell.revealed && cCell.number != -1) reveal(cCell);
             }
         }
     }
