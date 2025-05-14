@@ -25,7 +25,7 @@ function gen() {
                 td.id = `${i}_${j}`;
                 td.revealed = false;
                 td.number = 0;
-                td.innerText = "##";
+                td.innerText = "#";
                 td.flagged = false;
                 td.isMine = Math.floor((Math.random()*100)+1)<=chance;
                     if (td.isMine) {
@@ -84,7 +84,7 @@ function flag(cell) {
             mines--;
             mineCounter.innerText = mines;
         } else {
-            cell.innerText = "##";
+            cell.innerText = "#";
             cell.flagged = false;
             mines++;
             mineCounter.innerText = mines;
@@ -116,7 +116,7 @@ function peek(cell) {
             var cCell = document.getElementById(`${cI+dirs[i][0]}_${cJ+dirs[i][1]}`);
             if (!cCell.flagged && !cCell.revealed)
                 console.log(dirs[i], cCell);
-                if (!cCell.revealed && !cCell.flagged) cCell.innerText = "__";
+                if (!cCell.revealed && !cCell.flagged) cCell.innerText = "_";
         }
     }
 }
@@ -128,8 +128,8 @@ function unpeek() {
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
             const cCell = document.getElementById(`${i}_${j}`);
-            if (cCell.innerText == "__") {
-                cCell.innerText = "##";
+            if (cCell.innerText == "_") {
+                cCell.innerText = "#";
             }
         }
     }
