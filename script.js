@@ -26,17 +26,11 @@ function gen() {
                 td.isBomb = Math.floor((Math.random()*100)+1)<=chance;
                     // if (td.isBomb) td.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
                 td.onclick = () => {clickCheck(td)}
-                td.addEventListener('contextmenu', (td) => {
+                td.addEventListener('contextmenu', (event) => {
                     event.preventDefault();
-                    if (!td.flagged) {
-                        td.innerText = "!!";
-                        td.flagged = true;
-                    } else {
-                        td.innerText = "##";
-                        td.flagged = false;
-                    }
+                    flag(td);
                     return false;
-                }, false);
+                });
                 tr.appendChild(td);
             }
             table.appendChild(tr);
@@ -66,14 +60,31 @@ function isInbounds(i, j, h, w) {
     return true;
 }
 
+function flag(cell) {
+    console.log("fdjoifhsdkj")
+    if (!cell.revealed) {
+        if (cell.flagged == false) {
+        console.log("flagged");
+            cell.innerText = "!!";
+            cell.flagged = true;
+        } else {
+            console.log("unflagged");
+            cell.innerText = "##";
+            cell.flagged = false;
+        }
+    }
+}
+
 function clickCheck(cell) {
-    cell.onclick = "";
-    if (cell.isBomb) {
-        document.body.style.display = "none";
-        console.log("bomb");
-    } else {
-        reveal(cell);
-        console.log("not bomb, num: " + cell.number + " " + cell.id);
+    if (!cell.flagged) {
+        cell.onclick = "";
+        if (cell.isBomb) {
+            document.body.style.display = "none";
+            console.log("bomb");
+        } else {
+            reveal(cell);
+            console.log("not bomb, num: " + cell.number + " " + cell.id);
+        }
     }
 }
 
