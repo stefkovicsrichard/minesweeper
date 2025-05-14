@@ -1,4 +1,6 @@
 const dirs = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]];
+const mineCounter = document.getElementById("mines");
+var mines = 0;
 
 function gen() {
     if (document.getElementById("table")) {
@@ -13,7 +15,9 @@ function gen() {
         const table = document.createElement("table");
         table.cWidth = width;
         table.cHeight = height;
-        table.id = "table"
+        table.id = "table";
+        mines = 0;
+        mineCounter.innerText = mines;
         for (let i = 0; i < height; i++) {
             const tr = document.createElement("tr");
             for (let j = 0; j < width; j++) {
@@ -23,8 +27,11 @@ function gen() {
                 td.number = 0;
                 td.innerText = "##";
                 td.flagged = false;
-                td.isBomb = Math.floor((Math.random()*100)+1)<=chance;
-                    // if (td.isBomb) td.style.backgroundColor = "rgba(255, 0, 0, 0.2)";
+                td.isMine = Math.floor((Math.random()*100)+1)<=chance;
+                    if (td.isMine) {
+                        mines++;
+                        mineCounter.innerText = mines;
+                    }
                 td.onclick = () => {clickCheck(td)}
                 td.addEventListener('contextmenu', (event) => {
                     event.preventDefault();
@@ -42,10 +49,10 @@ function gen() {
         for (let i = 0; i < height; i++) {
             for (let j = 0; j < width; j++) {
                 var cell = document.getElementById(`${i}_${j}`);
-                if (cell.isBomb) cell.number = -1; else {
+                if (cell.isMine) cell.number = -1; else {
                     for (let k = 0; k < dirs.length; k++) {
                         if (isInbounds(i+dirs[k][0], j+dirs[k][1], height, width)) {
-                            if (document.getElementById(`${i+dirs[k][0]}_${j+dirs[k][1]}`).isBomb) cell.number++;
+                            if (document.getElementById(`${i+dirs[k][0]}_${j+dirs[k][1]}`).isMine) cell.number++;
                         }
                     }
                 }
@@ -60,14 +67,27 @@ function isInbounds(i, j, h, w) {
     return true;
 }
 
+function peekable(cell) {
+    cell.onmousedown = () => {
+        peek(cell);
+    }
+    cell.onmouseup = () => {
+        unpeek();
+    };
+}
+
 function flag(cell) {
     if (!cell.revealed) {
         if (cell.flagged == false) {
             cell.innerText = "!!";
             cell.flagged = true;
+            mines--;
+            mineCounter.innerText = mines;
         } else {
             cell.innerText = "##";
             cell.flagged = false;
+            mines++;
+            mineCounter.innerText = mines;
         }
     }
 }
@@ -75,7 +95,7 @@ function flag(cell) {
 function clickCheck(cell) {
     if (!cell.flagged) {
         cell.onclick = "";
-        if (cell.isBomb) {
+        if (cell.isMine) {
             document.body.style.display = "none";
         } else {
             reveal(cell);
@@ -83,38 +103,57 @@ function clickCheck(cell) {
     }
 }
 
-function reveal(cell) {
-    cell.innerText = cell.number;
-    cell.revealed = true;
-    cell.onclick = "";
-    if (cell.number == 0) {
-        const table = document.getElementById("table");
-        const height = table.cHeight;
-        const width = table.cWidth;
-        const cellId = cell.id.split("_");
-        const cI = cellId[0]*1;
-        const cJ = cellId[1]*1;
-        console.log(cellId, cI, cJ, width, height)
-        for (let i = 0; i < dirs.length; i++) {
-            if (isInbounds(cI+dirs[i][0], cJ+dirs[i][1], height, width)) {
-                var cCell = document.getElementById(`${cI+dirs[i][0]}_${cJ+dirs[i][1]}`);
+function peek(cell) {
+    const table = document.getElementById("table");
+    const height = table.cHeight;
+    const width = table.cWidth;
+    const cellId = cell.id.split("_");
+    const cI = cellId[0]*1;
+    const cJ = cellId[1]*1;
+    console.log(cellId, cI, cJ, width, height)
+    for (let i = 0; i < dirs.length; i++) {
+        if (isInbounds(cI+dirs[i][0], cJ+dirs[i][1], height, width)) {
+            var cCell = document.getElementById(`${cI+dirs[i][0]}_${cJ+dirs[i][1]}`);
+            if (!cCell.flagged && !cCell.revealed)
                 console.log(dirs[i], cCell);
-                if (!cCell.revealed && cCell.number != -1) reveal(cCell);
+                if (!cCell.revealed && !cCell.flagged) cCell.innerText = "__";
+        }
+    }
+}
+
+function unpeek() {
+    const table = document.getElementById("table");
+    const height = table.cHeight;
+    const width = table.cWidth;
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            const cCell = document.getElementById(`${i}_${j}`);
+            if (cCell.innerText == "__") {
+                cCell.innerText = "##";
             }
         }
     }
 }
 
-function isBomb(cell) {
-    table = document.getElementById("table");
-    for (let i = 0; i < table.cHeight; i++) {
-        for (let j = 0; j < table.cWidth; j++) {
-            var coords = cell.split("_");
-            if (i == coords[0] && j == coords[1]) {
-                if (document.getElementById(cell).isBomb) {
-                    console.log("bomb");
-                } else {
-                    console.log("not bomb");
+function reveal(cell) {
+    if (!cell.revealed) {
+        cell.innerText = cell.number;
+        cell.onclick = "";
+        cell.revealed = true;
+        peekable(cell);
+        if (cell.number == 0) {
+            const table = document.getElementById("table");
+            const height = table.cHeight;
+            const width = table.cWidth;
+            const cellId = cell.id.split("_");
+            const cI = cellId[0]*1;
+            const cJ = cellId[1]*1;
+            console.log(cellId, cI, cJ, width, height)
+            for (let i = 0; i < dirs.length; i++) {
+                if (isInbounds(cI+dirs[i][0], cJ+dirs[i][1], height, width)) {
+                    var cCell = document.getElementById(`${cI+dirs[i][0]}_${cJ+dirs[i][1]}`);
+                    console.log(dirs[i], cCell);
+                    if (!cCell.revealed && cCell.number != -1) reveal(cCell);
                 }
             }
         }
