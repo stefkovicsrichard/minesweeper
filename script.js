@@ -36,16 +36,20 @@ function gen() {
                 td.innerText = "#";
                 td.flagged = false;
                 td.isMine = Math.floor((Math.random()*100)+1)<=chance;
-                    if (td.isMine) {
-                        mines++;
-                        mineCounter.innerText = mines;
-                    }
+                if (td.isMine) {
+                    mines++;
+                    mineCounter.innerText = mines;
+                    td.style.backgroundColor = "rgba(255,0,0,0.2)"
+                }
                 td.onclick = () => {reveal(td)}
                 td.addEventListener('contextmenu', (event) => {
                     event.preventDefault();
                     flag(td);
                     return false;
                 });
+                td.onmouseup = () => {
+                    unpeek(td);
+                };
                 tr.appendChild(td);
             }
             table.appendChild(tr);
@@ -64,6 +68,7 @@ function gen() {
                         }
                     }
                 }
+                cell.classList.add(`n${cell.number}`);
             }
         }
         //#endregion
@@ -95,6 +100,11 @@ function time() {
 }
 
 function isInbounds(i, j, h, w) {
+    console.log(i,j,h,w);
+    console.log(i >= h);
+    console.log(i < 0);
+    console.log(j >= w);
+    console.log(j < 0);
     if (i >= h || i < 0 || j >= w || j < 0) return false;
     return true;
 }
@@ -103,9 +113,6 @@ function peekable(cell) {
     cell.onmousedown = () => {
         peek(cell);
     }
-    cell.onmouseup = () => {
-        unpeek(cell);
-    };
 }
 
 function flag(cell) {
@@ -141,6 +148,8 @@ function lose() {
     sTime = "";
     sec = 0;
     min = 0;
+    mines = 0;
+    document.getElementById("mines").innerText = "";
     document.getElementById("timer").innerText = "";
     document.getElementById("table").remove();
 }
@@ -164,18 +173,19 @@ function peek(cell) {
     }
 }
 
+//https://stackoverflow.com/questions/6562727/is-there-a-function-to-deselect-all-text-using-javascript
+//kodfutas leallasanak megakadalyozasa select kozben
+function clearSelection()
+{
+    if (window.getSelection) {window.getSelection().removeAllRanges();}
+    else if (document.selection) {document.selection.empty();}
+}
+
 function unpeek(cell) {
-    // const table = document.getElementById("table");
-    // const height = table.cHeight;
-    // const width = table.cWidth;
-    // for (let i = 0; i < height; i++) {
-    //     for (let j = 0; j < width; j++) {
-    //         const cCell = document.getElementById(`${i}_${j}`);
-    //         if (cCell.innerText == "_") {
-    //             cCell.innerText = "#";
-    //         }
-    //     }
-    // }
+    clearSelection();
+    const table = document.getElementById("table");
+    const height = table.cHeight;
+    const width = table.cWidth;
     const cellId = cell.id.split("_");
     const cI = cellId[0]*1;
     const cJ = cellId[1]*1;
@@ -197,6 +207,14 @@ function unpeek(cell) {
                 } else {
                     cCell.innerText = "#";
                 }
+            }
+        }
+    }
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            var cCell = document.getElementById(`${i}_${j}`);
+            if (cCell.innerText == "_") {
+                cCell.innerText = "#";
             }
         }
     }

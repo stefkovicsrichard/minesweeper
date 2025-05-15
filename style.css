@@ -2,6 +2,38 @@ td {
     width: 32px;
     height: 32px;
     font-size: x-large;
-    background-color: lightgray;
+    background-color: rgb(236, 236, 236);
     text-align: center;
+}
+
+.n1 {
+    color: blue;
+}
+
+.n2 {
+    color: green;
+}
+
+.n3 {
+    color: red;
+}
+
+.n4 {
+    color: purple;
+}
+
+.n5 {
+    color: brown;
+}
+
+.n6 {
+    color: teal;
+}
+
+.n7 {
+    color: black;
+}
+
+.n8 {
+    color: gray
 }
