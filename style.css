@@ -1,9 +1,44 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #111;
+    color: #f0f0f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
 td {
     width: 32px;
     height: 32px;
     font-size: x-large;
     background-color: rgb(236, 236, 236);
     text-align: center;
+    color: #111;
+}
+
+input[type="button"] {
+    border-radius: 5px;
+    padding: 3px 7px;
+    font-size: large;
+    display: block;
+    background-color: rgb(236,236,236);
+    color: #111;
+    border: none;
+    margin: 20px 20px;
+}
+
+#counters {
+    float: inline-end;
+    text-align: right;
+}
+
+#fields {
+    display: inline;
 }
 
 .n1 {
@@ -36,4 +71,21 @@ td {
 
 .n8 {
     color: gray
+}
+
+.peeking {
+    background-color: rgba(255, 255, 255, 0.35);
+}
+
+.revealed {
+    background-color: rgb(196,196,196);
+}
+
+.mine {
+    background-color: rgb(255, 135, 135);
+    font-size: x-large;
+}
+
+table {
+    margin: auto;
 }

@@ -1,6 +1,7 @@
 const dirs = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]];
 const mineCounter = document.getElementById("mines");
 var mines = 0;
+var tMines = 0;
 var peeking = 0;
 var timer;
 var sTime;
@@ -10,10 +11,8 @@ var sec = 0;
 function gen() {
     if (document.getElementById("table")) {
         document.getElementById("table").remove();
+        clearTimer(true);
         gen()
-        clearInterval(timer)
-        timer = null;
-        time = "";
     } else {
         //#region tablegen
         const width = parseInt(document.getElementById("width").value);
@@ -33,22 +32,19 @@ function gen() {
                 td.id = `${i}_${j}`;
                 td.revealed = false;
                 td.number = 0;
-                td.innerText = "#";
                 td.flagged = false;
                 td.isMine = Math.floor((Math.random()*100)+1)<=chance;
                 if (td.isMine) {
                     mines++;
+                    tMines = mines;
                     mineCounter.innerText = mines;
-                    td.style.backgroundColor = "rgba(255,0,0,0.2)"
                 }
                 td.onclick = () => {reveal(td)}
-                td.addEventListener('contextmenu', (event) => {
-                    event.preventDefault();
-                    flag(td);
-                    return false;
-                });
-                td.onmouseup = () => {
-                    unpeek(td);
+                td.addEventListener('contextmenu', contextMenuReplacer);
+                td.onmouseup = (event) => {
+                    if (event.button == 0) {
+                        unpeek(td);
+                    }
                 };
                 tr.appendChild(td);
             }
@@ -68,7 +64,6 @@ function gen() {
                         }
                     }
                 }
-                cell.classList.add(`n${cell.number}`);
             }
         }
         //#endregion
@@ -100,18 +95,15 @@ function time() {
 }
 
 function isInbounds(i, j, h, w) {
-    console.log(i,j,h,w);
-    console.log(i >= h);
-    console.log(i < 0);
-    console.log(j >= w);
-    console.log(j < 0);
     if (i >= h || i < 0 || j >= w || j < 0) return false;
     return true;
 }
 
 function peekable(cell) {
-    cell.onmousedown = () => {
-        peek(cell);
+    cell.onmousedown = (event) => {
+        if (event.button == 0){
+            peek(cell);
+        }
     }
 }
 
@@ -123,7 +115,7 @@ function flag(cell) {
             mines--;
             mineCounter.innerText = mines;
         } else {
-            cell.innerText = "#";
+            cell.innerText = "";
             cell.flagged = false;
             mines++;
             mineCounter.innerText = mines;
@@ -142,16 +134,34 @@ function flag(cell) {
 //     }
 // }
 
-function lose() {
+function clearTimer(bool) {
     clearInterval(timer);
     timer = null;
     sTime = "";
     sec = 0;
     min = 0;
     mines = 0;
-    document.getElementById("mines").innerText = "";
-    document.getElementById("timer").innerText = "";
-    document.getElementById("table").remove();
+    if (bool) {
+        document.getElementById("mines").innerText = "";
+        document.getElementById("timer").innerText = "";
+    }
+}
+
+function lose() {
+    const table = document.getElementById("table");
+    const height = table.cHeight;
+    const width = table.cWidth;
+    clearTimer(true);
+    table.style.boxShadow = "0px 0px 7px 7px red";
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            var cCell = document.getElementById(`${i}_${j}`);
+            cCell.onclick = "";
+            cCell.onmousedown = "";
+            cCell.onmouseup = "";
+            cCell.removeEventListener('contextmenu', contextMenuReplacer);
+        }
+    }
 }
 
 function peek(cell) {
@@ -166,7 +176,7 @@ function peek(cell) {
             var cCell = document.getElementById(`${cI+dirs[i][0]}_${cJ+dirs[i][1]}`);
             if (!cCell.flagged && !cCell.revealed)
                 if (!cCell.revealed && !cCell.flagged) {
-                    cCell.innerText = "_";
+                    cCell.classList.add("peeking")
                     peeking++;
                 }
         }
@@ -204,8 +214,6 @@ function unpeek(cell) {
             if (!cCell.flagged && !cCell.revealed) {
                 if (flagged == cell.number) {
                     reveal(cCell);
-                } else {
-                    cCell.innerText = "#";
                 }
             }
         }
@@ -213,38 +221,82 @@ function unpeek(cell) {
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
             var cCell = document.getElementById(`${i}_${j}`);
-            if (cCell.innerText == "_") {
-                cCell.innerText = "#";
+            if (cCell.classList.contains("peeking")) {
+                cCell.classList.remove("peeking")
             }
         }
     }
     peeking = 0;
 }
 
-function reveal(cell) {
-    if (cell.isMine) {
-        lose();
+function endCheck() {
+    var rCells = 0;
+    var fCells = 0;
+    const table = document.getElementById("table");
+    const height = table.cHeight;
+    const width = table.cWidth;
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            var cCell = document.getElementById(`${i}_${j}`);
+            if (!cCell.revealed && !cCell.flagged) rCells++;
+            if (cCell.flagged) fCells++;
+        }
     }
-    if (!cell.revealed) {
-        cell.innerText = cell.number;
-        cell.onclick = "";
-        cell.revealed = true;
-        peekable(cell);
-        if (cell.number == 0) {
-            const table = document.getElementById("table");
-            const height = table.cHeight;
-            const width = table.cWidth;
-            const cellId = cell.id.split("_");
-            const cI = cellId[0]*1;
-            const cJ = cellId[1]*1;
-            console.log(cellId, cI, cJ, width, height)
-            for (let i = 0; i < dirs.length; i++) {
-                if (isInbounds(cI+dirs[i][0], cJ+dirs[i][1], height, width)) {
-                    var cCell = document.getElementById(`${cI+dirs[i][0]}_${cJ+dirs[i][1]}`);
-                    console.log(dirs[i], cCell);
-                    if (!cCell.revealed && cCell.number != -1) reveal(cCell);
+    if (rCells == mineCounter || rCells+fCells == tMines) {
+        table.style.boxShadow = "0px 0px 7px 7px goldenrod";
+        clearTimer(false);
+        for (let i = 0; i < height; i++) {
+            for (let j = 0; j < width; j++) {
+                var cCell = document.getElementById(`${i}_${j}`);
+                if (!cCell.revealed) {
+                    cCell.innerText = "!!";
+                }
+                cCell.onclick = "";
+                cCell.onmousedown = "";
+                cCell.onmouseup = "";
+                cCell.removeEventListener('contextmenu', contextMenuReplacer);
+            }
+        }
+    }
+}
+
+function contextMenuReplacer(event) {
+    event.preventDefault();
+    flag(this);
+    return false;
+}
+
+function reveal(cell) {
+    if (!cell.flagged) {
+        if (cell.isMine) {
+            cell.innerText = "*";
+            cell.classList.add("mine");
+            lose();
+        }
+        if (!cell.revealed) {
+            if (!cell.number == 0 && !cell.isMine) {
+                cell.classList.add(`n${cell.number}`);
+                cell.innerText = cell.number;
+            }
+            cell.onclick = "";
+            cell.revealed = true;
+            cell.classList.add("revealed");
+            peekable(cell);
+            if (cell.number == 0) {
+                const table = document.getElementById("table");
+                const height = table.cHeight;
+                const width = table.cWidth;
+                const cellId = cell.id.split("_");
+                const cI = cellId[0]*1;
+                const cJ = cellId[1]*1;
+                for (let i = 0; i < dirs.length; i++) {
+                    if (isInbounds(cI+dirs[i][0], cJ+dirs[i][1], height, width)) {
+                        var cCell = document.getElementById(`${cI+dirs[i][0]}_${cJ+dirs[i][1]}`);
+                        if (!cCell.revealed && cCell.number != -1) reveal(cCell);
+                    }
                 }
             }
         }
+        endCheck();
     }
 }
