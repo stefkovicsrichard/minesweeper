@@ -3,7 +3,7 @@ const mineCounter = document.getElementById("mines");
 var mines = 0;
 var peeking = 0;
 var timer;
-var time;
+var sTime;
 var min = 0;
 var sec = 0;
 
@@ -11,7 +11,8 @@ function gen() {
     if (document.getElementById("table")) {
         document.getElementById("table").remove();
         gen()
-        clearInterval(timer);
+        clearInterval(timer)
+        timer = null;
         time = "";
     } else {
         //#region tablegen
@@ -67,7 +68,7 @@ function gen() {
         }
         //#endregion
         document.getElementById("timer").innerText = "00:00";
-        timer = setInterval(() => {time()}, 1000);
+        timer = setInterval(time, 1000)
     }
 }
 
@@ -79,18 +80,18 @@ function time() {
     }
     if (min < 10) {
         if (sec < 10) {
-            timer = `0${min}:0${sec}`
+            sTime = `0${min}:0${sec}`
         } else {
-            timer = `0${min}:${sec}`
+            sTime = `0${min}:${sec}`
         }
     } else {
         if (sec < 10) {
-            timer = `${min}:0${sec}`
+            sTime = `${min}:0${sec}`
         } else {
-            timer = `${min}:${sec}`
+            sTime = `${min}:${sec}`
         }
     }
-    document.getElementById("timer").innerText = timer;
+    document.getElementById("timer").innerText = sTime;
 }
 
 function isInbounds(i, j, h, w) {
@@ -136,8 +137,12 @@ function flag(cell) {
 
 function lose() {
     clearInterval(timer);
+    timer = null;
+    sTime = "";
+    sec = 0;
+    min = 0;
+    document.getElementById("timer").innerText = "";
     document.getElementById("table").remove();
-    time = "";
 }
 
 function peek(cell) {
