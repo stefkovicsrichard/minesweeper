@@ -261,6 +261,7 @@ function endCheck() {
     }
     if (rCells == mineCounter || rCells+fCells == tMines) {
         table.style.boxShadow = "0px 0px 7px 7px goldenrod";
+		mineCounter = 0;
         clearTimer(false);
         for (let i = 0; i < height; i++) {
             for (let j = 0; j < width; j++) {
