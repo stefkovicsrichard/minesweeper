@@ -7,11 +7,13 @@ var timer;
 var sTime;
 var min = 0;
 var sec = 0;
+var ischeating = 0;
 
 function gen() {
     if (document.getElementById("table")) {
         document.getElementById("table").remove();
         clearTimer(true);
+        ischeating = 0;
         gen()
     } else {
         //#region tablegen
@@ -69,6 +71,21 @@ function gen() {
         //#endregion
         document.getElementById("timer").innerText = "00:00";
         timer = setInterval(time, 1000)
+    }
+}
+
+function cheat() {
+    var tds = document.querySelectorAll("td");
+    if (ischeating === 1) {
+        ischeating = 0;
+        tds.forEach(e => {
+            if (e.isMine) e.classList.remove("fasz");
+        });
+    } else {
+        tds.forEach(e => {
+            if (e.isMine) e.classList.add("fasz");
+        });
+        ischeating = 1;
     }
 }
 

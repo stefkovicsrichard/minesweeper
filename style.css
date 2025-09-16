@@ -41,6 +41,12 @@ input[type="button"] {
     display: inline;
 }
 
+#cheatbtn {
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+}
+
 .n1 {
     color: blue;
 }
@@ -87,5 +93,9 @@ input[type="button"] {
 }
 
 table {
-    margin: auto;
+    margin: auto auto 75px auto;
+}
+
+.fasz {
+	background-color: rgb(100, 100, 100);
 }
