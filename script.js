@@ -42,8 +42,6 @@ function gen() {
                     mines++;
                     tMines = mines;
                     mineCounter.innerText = mines;
-                } else if (td.number == 0) {
-                    safes.push(td);
                 }
                 td.onclick = () => {reveal(td)}
                 td.addEventListener('contextmenu', contextMenuReplacer);
@@ -72,6 +70,9 @@ function gen() {
                 }
             }
         }
+        document.querySelectorAll("td").forEach(e =>{
+            if (e.number == 0) safes.push(e);
+        })
         var safen = Math.floor(Math.random()*(safes.length-1));
         safes[safen].classList.add("starter");
         //#endregion
