@@ -1,6 +1,7 @@
 const dirs = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]];
 const mineCounter = document.getElementById("mines");
 const safes = [];
+const unsafes = [];
 var mines = 0;
 var tMines = 0;
 var peeking = 0;
