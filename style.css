@@ -32,6 +32,8 @@ input[type="button"] {
     margin: 20px 20px;
 }
 
+
+
 #counters {
     float: inline-end;
     text-align: right;
@@ -92,10 +94,14 @@ input[type="button"] {
     font-size: x-large;
 }
 
+.starter {
+    background-color: lightgreen;
+}
+
 table {
     margin: auto auto 75px auto;
 }
 
-.fasz {
+.highlighted {
 	background-color: rgb(100, 100, 100);
 }

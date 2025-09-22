@@ -1,5 +1,6 @@
 const dirs = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]];
 const mineCounter = document.getElementById("mines");
+const safes = [];
 var mines = 0;
 var tMines = 0;
 var peeking = 0;
@@ -14,6 +15,7 @@ function gen() {
         document.getElementById("table").remove();
         clearTimer(true);
         ischeating = 0;
+        safes.length = 0;
         gen()
     } else {
         //#region tablegen
@@ -40,6 +42,8 @@ function gen() {
                     mines++;
                     tMines = mines;
                     mineCounter.innerText = mines;
+                } else if (td.number == 0) {
+                    safes.push(td);
                 }
                 td.onclick = () => {reveal(td)}
                 td.addEventListener('contextmenu', contextMenuReplacer);
@@ -68,6 +72,8 @@ function gen() {
                 }
             }
         }
+        var safen = Math.floor(Math.random()*(safes.length-1));
+        safes[safen].classList.add("starter");
         //#endregion
         document.getElementById("timer").innerText = "00:00";
         timer = setInterval(time, 1000)
@@ -79,11 +85,11 @@ function cheat() {
     if (ischeating === 1) {
         ischeating = 0;
         tds.forEach(e => {
-            if (e.isMine) e.classList.remove("fasz");
+            if (e.isMine) e.classList.remove("highlighted");
         });
     } else {
         tds.forEach(e => {
-            if (e.isMine) e.classList.add("fasz");
+            if (e.isMine) e.classList.add("highlighted");
         });
         ischeating = 1;
     }
@@ -299,6 +305,7 @@ function reveal(cell) {
             cell.onclick = "";
             cell.revealed = true;
             cell.classList.add("revealed");
+            if (cell.classList.contains("starter")) cell.classList.remove("starter");
             peekable(cell);
             if (cell.number == 0) {
                 const table = document.getElementById("table");
